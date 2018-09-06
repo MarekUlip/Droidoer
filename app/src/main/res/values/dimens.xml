@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="but_width">40dp</dimen>
+    <dimen name="list_item_margin">16dp</dimen>
+    <dimen name="sub_item_margin">8dp</dimen>
+    <dimen name="list_item_around_margin">5dp</dimen>
+</resources>
