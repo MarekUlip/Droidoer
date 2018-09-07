@@ -13,7 +13,10 @@ import kotlinx.android.synthetic.main.sub_item.view.*
 class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback):RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
 
     var category = 0
-    var subTaskSetting = false
+    /**
+     * Indicates wheter context menu was raised by sub task
+     */
+    var isSubTaskSetting = false
 
     override fun getItemCount(): Int = mValues.size
 
@@ -26,14 +29,16 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
 
+        // Set context menu for list item
         holder.mView.setOnLongClickListener {
             listener.setMainTaskHldr(item)
             holder.mView.showContextMenu()
             true
         }
         holder.mView.setOnCreateContextMenuListener { menu, _, _ ->
-            if(subTaskSetting){
-                subTaskSetting = false
+            if(isSubTaskSetting){
+                // Context menu was raised by some sub items. Don't display anything else
+                isSubTaskSetting = false
                 return@setOnCreateContextMenuListener
             }
             menu.add(0,R.id.action_rename,0,R.string.rename)
@@ -44,6 +49,7 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 menu.add(0, R.id.action_mark_complete, 0, R.string.mark_as_completed)
             }
         }
+
         holder.mWrapper.removeAllViews()
         val inflater = LayoutInflater.from(context)
         for (i in item.subTasks){
@@ -56,12 +62,12 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             }else{
                 view.but_cancel.visibility = View.GONE
                 view.but_meh.visibility = View.GONE
-                view.but_done.text = "➞"
+                view.but_done.text = context.getString(R.string.return_task)
                 view.but_done.setOnClickListener { listener.onCategoryChange(i, SubTask.CAT_NONE,position) }
             }
 
             view.setOnLongClickListener{
-                subTaskSetting = true
+                isSubTaskSetting = true
                 view.showContextMenu()
                 listener.setSubTaskHldr(i)
                 true  }

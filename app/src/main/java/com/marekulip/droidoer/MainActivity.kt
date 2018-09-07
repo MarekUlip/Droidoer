@@ -23,7 +23,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         fragment?.category = position
     }
 
+    /**
+     * Sub task category
+     */
     var category:Int = 0
+    /**
+     * Indicates wheter activity is displaying completed main tasks
+     */
     var displayingCompleted = false
     var fragment: TodoFragment? = null
 

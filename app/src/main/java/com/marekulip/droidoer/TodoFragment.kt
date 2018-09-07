@@ -33,8 +33,14 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         field = value
         reloadAdapterItems()
     }
-    var mainTaskHolder: MainTask? = null
-    var subTaskHolder: SubTask? = null
+    /**
+     * Main task holder for editing a Main task that was selected in adapter
+     */
+    private var mainTaskHolder: MainTask? = null
+    /**
+     * Sub task holder for editing a Main task that was selected in adapter
+     */
+    private var subTaskHolder: SubTask? = null
     var database: DroidoerDatabase? = null
 
     private var listener: OnFragmentInteractionListener? = null
@@ -119,14 +125,22 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         return true
     }
 
+    /**
+     * Creates dialog for creating or updating Main task
+     */
     private fun createMainDialog(isNew:Boolean, text:String?){
         createAlertDialog(true,isNew,text,null)
     }
-
+    /**
+     * Creates dialog for creating or updating Sub task
+     */
     private fun createSubDialog(isNew:Boolean, text:String?, mainTaskId: Long){
         createAlertDialog(false,isNew,text,mainTaskId)
     }
 
+    /**
+     * Loads main tasks with theirs sub tasks from database. Not that results are dependent on [isDisplayingCompleted] and [category] parameters
+     */
     private fun loadTasks():MutableList<MainTask>{
         val mainItems = if(isDisplayingCompleted) {
             database?.mainTaskDataDao()?.getSome(true)
@@ -159,6 +173,9 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         return mainItems ?: ArrayList()
     }
 
+    /**
+     * Loads main task with its sub tasks from database based on provided id
+     */
     private fun loadTask(id:Long):MainTask{
         val mainItem = database?.mainTaskDataDao()?.findById(id)
         val subItems = when(category) {
@@ -233,12 +250,18 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         mAdapter?.notifyItemChanged(pos)
     }
 
+    /**
+     * Reloads items from database and updates adapter with them
+     */
     private fun reloadAdapterItems(){
         listItems = loadTasks()
         mAdapter?.mValues = listItems
         mAdapter?.notifyDataSetChanged()
     }
 
+    /**
+     * Finds main task position in current displayed [listItems]
+     */
     private fun findMainTaskById(id:Long): Int{
         for((index, value) in listItems.withIndex()){
             if(value.id == id){
@@ -271,17 +294,7 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
     }
 
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
+
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onFragmentInteraction(uri: Uri)
