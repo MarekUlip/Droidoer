@@ -7,25 +7,19 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.InputType
 import android.view.*
 import android.widget.EditText
 import com.marekulip.droidoer.database.DroidoerDatabase
 import com.marekulip.droidoer.database.MainTask
 import com.marekulip.droidoer.database.SubTask
-import kotlinx.android.synthetic.main.content_main.view.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val CATEGORY = "category"
 
 /**
  * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [TodoFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
  * Use the [TodoFragment.newInstance] factory method to
  * create an instance of this fragment.
- *
  */
 class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
     var category = 0
@@ -34,11 +28,15 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         mAdapter?.category = value
         reloadAdapterItems()
     }
+    var isDisplayingCompleted = false
+    set(value){
+        field = value
+        reloadAdapterItems()
+    }
     var mainTaskHolder: MainTask? = null
     var subTaskHolder: SubTask? = null
     var database: DroidoerDatabase? = null
 
-    private var param1: String? = null
     private var listener: OnFragmentInteractionListener? = null
     private var listItems: MutableList<MainTask> = ArrayList()
     private var mAdapter: MyTodoRecyclerViewAdapter? = null
@@ -92,11 +90,6 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         subTaskHolder = subTask
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         /*if (context is OnFragmentInteractionListener) {
@@ -116,7 +109,8 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         when(item?.itemId){
             R.id.action_rename -> createMainDialog(false,mainTaskHolder?.name)
             R.id.action_delete -> deleteTask()
-            R.id.action_mark_complete -> markTaskAsCompleted()
+            R.id.action_mark_complete -> changeTaskCompletionStat(true)
+            R.id.action_mark_active -> changeTaskCompletionStat(false)
             R.id.action_rename_sub -> createSubDialog(false,subTaskHolder?.description,subTaskHolder?.mainTaskId as Long)
             R.id.action_delete_sub -> deleteSubTask()
             else -> return false
@@ -134,7 +128,11 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
     }
 
     private fun loadTasks():MutableList<MainTask>{
-        val mainItems = database?.mainTaskDataDao()?.getAll()
+        val mainItems = if(isDisplayingCompleted) {
+            database?.mainTaskDataDao()?.getSome(true)
+        } else{
+            database?.mainTaskDataDao()?.getSome(false)
+        }
         if(mainItems is MutableList<MainTask>){
             val subItems = when(category) {
                 0,1,2,3 -> database?.subTaskDataDao()?.getAllByCat(category)
@@ -179,6 +177,8 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         val builder = AlertDialog.Builder(context)
         val editText = EditText(context)
         builder.setView(editText)
+        editText.requestFocus()
+        editText.inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
         if (isMainTask) {
             builder.setTitle("Main task name")
         } else{
@@ -206,7 +206,7 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         } else {
             editText.text.insert(0,text)
             builder.setPositiveButton("Rename"){ dialog, _ ->
-                var id = 0L
+                val id: Long
                 if (isMainTask){
                     mainTaskHolder?.name = editText.text.toString()
                     database?.mainTaskDataDao()?.updateAll(mainTaskHolder as MainTask)
@@ -255,9 +255,9 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         }
     }
 
-    private fun markTaskAsCompleted(){
+    private fun changeTaskCompletionStat(completed: Boolean){
         if(mainTaskHolder != null) {
-            mainTaskHolder?.completed = true
+            mainTaskHolder?.completed = completed
             database?.mainTaskDataDao()?.updateAll(mainTaskHolder as MainTask)
             reloadAdapterItems()
         }
@@ -289,14 +289,9 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
 
     companion object {
         /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
+         * @param category Subtasks category.
          * @return A new instance of fragment TodoFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(category: Int) =
                 TodoFragment().apply {
@@ -304,5 +299,9 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
                         putInt(CATEGORY, category)
                     }
                 }
+    }
+
+    inner class WorkerThread(db: DroidoerDatabase): Thread(){
+
     }
 }

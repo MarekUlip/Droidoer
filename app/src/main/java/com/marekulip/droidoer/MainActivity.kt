@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     var category:Int = 0
+    var displayingCompleted = false
     var fragment: TodoFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +51,15 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return true
     }
 
+    override fun onBackPressed() {
+        if (displayingCompleted){
+            displayingCompleted = false
+            fragment?.isDisplayingCompleted = false
+        } else{
+            finish()
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -57,6 +67,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return when (item.itemId) {
             R.id.action_add_task -> {
                 fragment?.addMainTask()
+                true
+            }
+
+            R.id.display_completed -> {
+                displayingCompleted = true
+                fragment?.isDisplayingCompleted = true
                 true
             }
             else -> super.onOptionsItemSelected(item)

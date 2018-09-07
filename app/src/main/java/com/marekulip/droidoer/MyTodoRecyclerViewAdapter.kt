@@ -3,7 +3,6 @@ package com.marekulip.droidoer
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
-import android.util.AttributeSet
 import android.view.*
 import android.widget.LinearLayout
 import com.marekulip.droidoer.database.MainTask
@@ -14,7 +13,6 @@ import kotlinx.android.synthetic.main.sub_item.view.*
 class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback):RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
 
     var category = 0
-    var callingPos = 0
     var subTaskSetting = false
 
     override fun getItemCount(): Int = mValues.size
@@ -33,14 +31,18 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             holder.mView.showContextMenu()
             true
         }
-        holder.mView.setOnCreateContextMenuListener { menu, v, menuInfo ->
+        holder.mView.setOnCreateContextMenuListener { menu, _, _ ->
             if(subTaskSetting){
                 subTaskSetting = false
                 return@setOnCreateContextMenuListener
             }
-            menu.add(0,R.id.action_rename,0,"Rename")
-            menu.add(0,R.id.action_delete,0,"Delete")
-            menu.add(0,R.id.action_mark_complete,0,"Mark as completed")
+            menu.add(0,R.id.action_rename,0,R.string.rename)
+            menu.add(0,R.id.action_delete,0,R.string.delete)
+            if(item.completed){
+                menu.add(0, R.id.action_mark_active, 0, R.string.mark_as_active)
+            } else {
+                menu.add(0, R.id.action_mark_complete, 0, R.string.mark_as_completed)
+            }
         }
         holder.mWrapper.removeAllViews()
         val inflater = LayoutInflater.from(context)
@@ -48,14 +50,10 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             val view = inflater.inflate(R.layout.sub_item,null)
             view.text_sub_task.text = i.description
             if(category == 0) {
-                //TODO uncomment if items remain hidden
-                /*view.but_cancel.visibility = View.VISIBLE
-                view.but_done.visibility = View.VISIBLE
-                view.but_meh.visibility = View.VISIBLE*/
                 view.but_cancel.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_CANCELED,position) }
                 view.but_done.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_DONE,position) }
                 view.but_meh.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_MEH,position) }
-            }else{//TODO solve this
+            }else{
                 view.but_cancel.visibility = View.GONE
                 view.but_meh.visibility = View.GONE
                 view.but_done.text = "➞"
@@ -68,9 +66,9 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 listener.setSubTaskHldr(i)
                 true  }
 
-            view.setOnCreateContextMenuListener { menu, v, menuInfo ->
-                menu.add(0,R.id.action_rename_sub,0,"Rename")
-                menu.add(0,R.id.action_delete_sub,0,"Delete")
+            view.setOnCreateContextMenuListener { menu, _, _ ->
+                menu.add(0,R.id.action_rename_sub,0,R.string.rename)
+                menu.add(0,R.id.action_delete_sub,0,R.string.delete)
             }
             // Strange workaround - resizes view when it was already drawn so all items are displayed
             // No idea how it works... maybe magic
