@@ -17,6 +17,11 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom"
         android:visible="false"/>
+    <item
+        android:id="@+id/action_mark_active"
+        android:title="@string/action_settings"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
 
     <item
         android:id="@+id/action_rename_sub"
