@@ -20,11 +20,9 @@ interface MainTaskDao {
 
     /**
      * Select all completed or uncompleted main tasks
-     * 0 - uncompleted
-     * 1 - completed
      */
     @Query("SELECT * FROM ${MainTask.TABLE_NAME} WHERE ${MainTask.COMPLETED}=:completed")
-    fun getSome(completed: Int):MutableList<MainTask>
+    fun getSome(completed: Boolean):MutableList<MainTask>
 
     @Query("SELECT * FROM ${MainTask.TABLE_NAME} WHERE id =:Id")
     fun findById(Id: Long):MainTask
