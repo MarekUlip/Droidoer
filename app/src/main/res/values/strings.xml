@@ -8,6 +8,7 @@
     <string name="delete_mark">❌</string>
     <string name="meh_mark">➖</string>
     <string name="add_mark">➕</string>
+    <string name="return_task">➞</string>
     <string name="add_task">Add Task</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
