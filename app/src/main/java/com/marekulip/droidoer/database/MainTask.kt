@@ -17,11 +17,5 @@ class MainTask(@PrimaryKey var id: Long?,
         const val TABLE_NAME = "Main_task"
         const val TASK_NAME = "task_name"
         const val COMPLETED = "completed"
-
-        const val CREATE_TABLE = "CREATE TABLE $TABLE_NAME (" +
-                "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-                "$TASK_NAME TEXT," +
-                "$COMPLETED INTEGER)"
-        const val DELETE_TABLE = "DROP TABLE IF EXISTS $TABLE_NAME"
     }
 }

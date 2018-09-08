@@ -12,8 +12,6 @@ class SubTask(@PrimaryKey(autoGenerate = true) var id: Long?,
               @ColumnInfo(name = DESCRITPION) var description: String,
               @ColumnInfo(name = CATEGORY)var category: Int,
               @ColumnInfo(name = MAIN_TASK)var mainTaskId: Long): BaseColumns {
-    @Ignore
-    var mainTask:MainTask? = null
     constructor():this(null,"",0,0)
 
     companion object {
@@ -26,12 +24,5 @@ class SubTask(@PrimaryKey(autoGenerate = true) var id: Long?,
         const val CAT_CANCELED = 1
         const val CAT_MEH = 2
         const val CAT_DONE = 3
-
-        const val CREATE_TABLE = "CREATE TABLE $TABLE_NAME (" +
-                "${BaseColumns._ID} INTEGER PRIMARY KEY," +
-                "$DESCRITPION TEXT," +
-                "$CATEGORY INTEGER," +
-                "$MAIN_TASK INTEGER)"
-        const val DELETE_TABLE = "DROP TABLE IF EXISTS $TABLE_NAME"
     }
 }
