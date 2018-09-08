@@ -314,7 +314,5 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
                 }
     }
 
-    inner class WorkerThread(db: DroidoerDatabase): Thread(){
-
-    }
+    inner class WorkerThread(db: DroidoerDatabase): Thread()
 }
