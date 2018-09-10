@@ -1,6 +1,7 @@
 package com.marekulip.droidoer
 
 import android.content.Context
+import android.graphics.Color
 import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.v7.widget.RecyclerView
@@ -15,8 +16,15 @@ import kotlinx.android.synthetic.main.sub_item.view.*
 class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback):RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
 
     var category = 0
+    private val textDone = context.getString(R.string.check_mark)
+    private val textMeh = context.getString(R.string.meh_mark)
+    private val textCancel = context.getString(R.string.delete_mark)
+    private val textReturn = context.getString(R.string.return_task)
+    private val colorCancel = Color.parseColor("#EA7A46")
+    private val colorMeh = Color.parseColor("#00D9D9")
+    private val colorDone = Color.parseColor("#00A500")
     /**
-     * Indicates wheter context menu was raised by sub task
+     * Indicates whether context menu was raised by sub task
      */
     var isSubTaskSetting = false
 
@@ -27,73 +35,6 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 .inflate(R.layout.list_item, parent, false)
         return ViewHolder(view)
     }
-
-    /*override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = mValues[position]
-
-        // Set context menu for list item
-        holder.mView.setOnLongClickListener {
-            listener.setMainTaskHldr(item)
-            holder.mView.showContextMenu()
-            true
-        }
-        holder.mView.setOnCreateContextMenuListener { menu, _, _ ->
-            if(isSubTaskSetting){
-                // Context menu was raised by some sub items. Don't display anything else
-                isSubTaskSetting = false
-                return@setOnCreateContextMenuListener
-            }
-            menu.add(0,R.id.action_rename,0,R.string.rename)
-            menu.add(0,R.id.action_delete,0,R.string.delete)
-            if(item.completed){
-                menu.add(0, R.id.action_mark_active, 0, R.string.mark_as_active)
-            } else {
-                menu.add(0, R.id.action_mark_complete, 0, R.string.mark_as_completed)
-            }
-        }
-
-        holder.mWrapper.removeAllViews()
-        val inflater = LayoutInflater.from(context)
-        for (i in item.subTasks){
-            val view = inflater.inflate(R.layout.sub_item,null)
-            view.text_sub_task.text = i.description
-            if(category == 0) {
-                view.but_cancel.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_CANCELED,position) }
-                view.but_done.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_DONE,position) }
-                view.but_meh.setOnClickListener { listener.onCategoryChange(i,SubTask.CAT_MEH,position) }
-            }else{
-                view.but_cancel.visibility = View.GONE
-                view.but_meh.visibility = View.GONE
-                view.but_done.text = context.getString(R.string.return_task)
-                view.but_done.setOnClickListener { listener.onCategoryChange(i, SubTask.CAT_NONE,position) }
-            }
-            view.setOnLongClickListener{
-                isSubTaskSetting = true
-                view.showContextMenu()
-                listener.setSubTaskHldr(i)
-                true  }
-
-            view.setOnCreateContextMenuListener { menu, _, _ ->
-                menu.add(0,R.id.action_rename_sub,0,R.string.rename)
-                menu.add(0,R.id.action_delete_sub,0,R.string.delete)
-            }
-            // Strange workaround - resizes view when it was already drawn so all items are displayed
-            // No idea how it works... maybe magic
-            // Even more weird is that when params are not assigned but modified directly
-            // no change happens.
-            val params = view.text_sub_task.layoutParams
-            params.height = LinearLayout.LayoutParams.WRAP_CONTENT
-            val lParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT)
-            lParams.bottomMargin = 50
-            holder.mWrapper.addView(view,lParams)
-        }
-        // But seriously I am afraid what doom will this code bring in the future.
-        val params = holder.mWrapper.layoutParams
-        params.height = ConstraintLayout.LayoutParams.WRAP_CONTENT
-
-        holder.mNameView.text = item.name
-        holder.mAddButton.setOnClickListener { listener.onSubTaskAdding(item) }
-    }*/
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
@@ -135,14 +76,26 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             }
             view.text_sub_task.text = value.description
             if(category == 0) {
+                view.but_cancel.visibility = View.VISIBLE
+                view.but_meh.visibility = View.VISIBLE
+                view.but_done.text = textDone
+                view.but_cancel.text = textCancel
+                view.but_meh.text = textMeh
                 view.but_cancel.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_CANCELED,position) }
                 view.but_done.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_DONE,position) }
                 view.but_meh.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_MEH,position) }
+                view.setBackgroundColor(Color.WHITE)
             }else{
                 view.but_cancel.visibility = View.GONE
                 view.but_meh.visibility = View.GONE
-                view.but_done.text = context.getString(R.string.return_task)
+                view.but_done.text = textReturn
                 view.but_done.setOnClickListener { listener.onCategoryChange(value, SubTask.CAT_NONE,position) }
+                when(value.category){
+                    0 -> view.setBackgroundColor(Color.WHITE)
+                    1 -> view.setBackgroundColor(colorCancel)
+                    2 -> view.setBackgroundColor(colorMeh)
+                    3 -> view.setBackgroundColor(colorDone)
+                }
             }
             view.setOnLongClickListener{
                 isSubTaskSetting = true

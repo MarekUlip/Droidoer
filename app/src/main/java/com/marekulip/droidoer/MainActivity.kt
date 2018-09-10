@@ -1,17 +1,15 @@
 package com.marekulip.droidoer
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
-import android.widget.Spinner
 
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.ArrayAdapter
-
+import android.widget.Spinner
 
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -20,6 +18,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        category = position
         fragment?.category = position
     }
 
@@ -32,6 +31,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
      */
     var displayingCompleted = false
     var fragment: TodoFragment? = null
+    var spinner: Spinner? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +42,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
         spinner.onItemSelectedListener = this
+        this.spinner = spinner
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         fragment = TodoFragment.newInstance(category)
@@ -61,7 +62,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         if (displayingCompleted){
             displayingCompleted = false
             fragment?.isDisplayingCompleted = false
-        } else{
+        } else if(category!= 0){
+            spinner?.setSelection(0)
+        }
+        else{
             finish()
         }
     }
