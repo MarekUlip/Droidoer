@@ -6,12 +6,13 @@ import android.support.constraint.ConstraintLayout
 import android.support.constraint.ConstraintSet
 import android.support.v7.widget.RecyclerView
 import android.transition.TransitionManager
+import android.util.TypedValue
 import android.view.*
-import android.widget.LinearLayout
+import android.widget.Button
+import android.widget.TextView
 import com.marekulip.droidoer.database.MainTask
 import com.marekulip.droidoer.database.SubTask
 import kotlinx.android.synthetic.main.list_item.view.*
-import kotlinx.android.synthetic.main.sub_item.view.*
 
 class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback):RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
 
@@ -26,7 +27,7 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
     /**
      * Indicates whether context menu was raised by sub task
      */
-    var isSubTaskSetting = false
+    private var isSubTaskSetting = false
 
     override fun getItemCount(): Int = mValues.size
 
@@ -60,50 +61,48 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             }
         }
 
-        val inflater = LayoutInflater.from(context)
         // This parameters tells if view is already present at layout so Constraint setting is not
         // necessary
         var isShouldSkip: Boolean
         for ((index, value) in item.subTasks.withIndex()){
-            val view:View
+            val view:SubViewHolder
             if(index<holder.mSubItemViews.size){
                 view = holder.mSubItemViews[index]
                 isShouldSkip = true
             }else {
-                view = inflater.inflate(R.layout.sub_item, null)
-                view.id = View.generateViewId()
+                view = SubViewHolder(holder.mView as ConstraintLayout)
                 isShouldSkip = false
             }
-            view.text_sub_task.text = value.description
+            view.descriptionView.text = value.description
             if(category == 0) {
-                view.but_cancel.visibility = View.VISIBLE
-                view.but_meh.visibility = View.VISIBLE
-                view.but_done.text = textDone
-                view.but_cancel.text = textCancel
-                view.but_meh.text = textMeh
-                view.but_cancel.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_CANCELED,position) }
-                view.but_done.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_DONE,position) }
-                view.but_meh.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_MEH,position) }
-                view.setBackgroundColor(Color.WHITE)
+                view.cancelBut.visibility = View.VISIBLE
+                view.mehBut.visibility = View.VISIBLE
+                view.doneBut.text = textDone
+                view.cancelBut.text = textCancel
+                view.mehBut.text = textMeh
+                view.cancelBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_CANCELED,position) }
+                view.doneBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_DONE,position) }
+                view.mehBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_MEH,position) }
+                view.descriptionView.setBackgroundColor(Color.WHITE)
             }else{
-                view.but_cancel.visibility = View.GONE
-                view.but_meh.visibility = View.GONE
-                view.but_done.text = textReturn
-                view.but_done.setOnClickListener { listener.onCategoryChange(value, SubTask.CAT_NONE,position) }
+                view.cancelBut.visibility = View.GONE
+                view.mehBut.visibility = View.GONE
+                view.doneBut.text = textReturn
+                view.doneBut.setOnClickListener { listener.onCategoryChange(value, SubTask.CAT_NONE,position) }
                 when(value.category){
-                    0 -> view.setBackgroundColor(Color.WHITE)
-                    1 -> view.setBackgroundColor(colorCancel)
-                    2 -> view.setBackgroundColor(colorMeh)
-                    3 -> view.setBackgroundColor(colorDone)
+                    0 -> view.descriptionView.setBackgroundColor(Color.WHITE)
+                    1 -> view.descriptionView.setBackgroundColor(colorCancel)
+                    2 -> view.descriptionView.setBackgroundColor(colorMeh)
+                    3 -> view.descriptionView.setBackgroundColor(colorDone)
                 }
             }
-            view.setOnLongClickListener{
+            view.descriptionView.setOnLongClickListener{
                 isSubTaskSetting = true
-                view.showContextMenu()
+                view.descriptionView.showContextMenu()
                 listener.setSubTaskHldr(value)
                 true  }
 
-            view.setOnCreateContextMenuListener { menu, _, _ ->
+            view.descriptionView.setOnCreateContextMenuListener { menu, _, _ ->
                 menu.add(0,R.id.action_rename_sub,0,R.string.rename)
                 menu.add(0,R.id.action_delete_sub,0,R.string.delete)
             }
@@ -111,36 +110,18 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 // Constraints were set do not set them again
                 continue
             }
-            val constraintSet = ConstraintSet()
-            holder.mView as ConstraintLayout
             if(index == 0){
-                holder.mView.addView(view)
-                constraintSet.clone(holder.mView)
-                constraintSet.connect(view.id,ConstraintSet.TOP,holder.mAddButton.id,ConstraintSet.BOTTOM)
-                constraintSet.connect(view.id,ConstraintSet.LEFT,holder.mView.id,ConstraintSet.LEFT,8)
-                constraintSet.connect(view.id,ConstraintSet.RIGHT,holder.mView.id,ConstraintSet.RIGHT,8)
-                constraintSet.constrainWidth(view.id,ConstraintSet.MATCH_CONSTRAINT)
+                view.generateRow(holder.mAddButton)
             }
             else if (index >= holder.mSubItemViews.size){
-                holder.mView.addView(view)
-                constraintSet.clone(holder.mView)
-                constraintSet.connect(view.id,ConstraintSet.TOP,holder.mSubItemViews[index-1].id,ConstraintSet.BOTTOM,16)
-                constraintSet.connect(view.id,ConstraintSet.LEFT,holder.mView.id,ConstraintSet.LEFT,8)
-                constraintSet.connect(view.id,ConstraintSet.RIGHT,holder.mView.id,ConstraintSet.RIGHT,8)
-                constraintSet.constrainWidth(view.id,ConstraintSet.MATCH_CONSTRAINT)
+                view.generateRow(holder.mSubItemViews[index-1].descriptionView)
             }
-            // Strange workaround - resizes view when it was already drawn so all items are displayed and text is correctly wrapped
-            // No idea how it works... maybe magic
-            view.text_sub_task.layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
-
-            TransitionManager.beginDelayedTransition(holder.mView)
-            constraintSet.applyTo(holder.mView)
             holder.mSubItemViews.add(view)
         }
         if(holder.mSubItemViews.size > item.subTasks.size){
             // If some items were taken away make sure that views disappear as well
             for (i in item.subTasks.size until holder.mSubItemViews.size){
-                (holder.mView as ConstraintLayout).removeView(holder.mSubItemViews[i])
+                holder.mSubItemViews[i].removeView()
             }
             // Cut views from list
             holder.mSubItemViews = holder.mSubItemViews.subList(0,item.subTasks.size)
@@ -151,12 +132,109 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
     }
 
 
-
-
     inner class ViewHolder(val mView:View):RecyclerView.ViewHolder(mView){
         val mNameView = mView.task_name
         val mAddButton = mView.add_sub_task
-        var mSubItemViews:MutableList<View> = ArrayList()
+        var mSubItemViews:MutableList<SubViewHolder> = ArrayList()
+    }
+
+    /**
+     * Sub view holder acting as wrapping layout except it does not have a layout. It has been created
+     * to increase performance because layout in layout in list item is really bad idea... easy to work with
+     * but BAD! With this holder the app is taking only one third of a time to display list items. Neat right?
+     * Only con is that it does not look so good... its decent... but not good.
+     */
+    inner class SubViewHolder(val parent:ConstraintLayout){
+        /**
+         * Precomputed minimal height. Dimensions are set in pixels so they have to be transformed into
+         * dp unit before use... well they don't have to but then it looks bad.
+         */
+        private val minHeight = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 40f,
+                parent.context.resources.displayMetrics).toInt()
+        /**
+         * Margin of single items. It was not transferred into dp because effect in pixels was good enough.
+         */
+        private val margin = 8
+        private val doneButTextColor = Color.parseColor("#00A800")
+
+        val doneBut = Button(parent.context)
+        val mehBut = Button(parent.context)
+        val cancelBut = Button(parent.context)
+        val descriptionView = TextView(parent.context)
+
+        init {
+            // Init views with properties that don't change
+            descriptionView.id = View.generateViewId()
+            descriptionView.setPadding(margin,margin,margin,margin)
+            descriptionView.setTextColor(Color.BLACK)
+
+            doneBut.id = View.generateViewId()
+            doneBut.setTextColor(doneButTextColor)
+
+            mehBut.text = textMeh
+            mehBut.id = View.generateViewId()
+
+            cancelBut.text = textCancel
+            cancelBut.id = View.generateViewId()
+        }
+
+        /**
+         * Removes all views from parent constraint layout
+         */
+        fun removeView(){
+            parent.removeView(doneBut)
+            parent.removeView(mehBut)
+            parent.removeView(cancelBut)
+            parent.removeView(descriptionView)
+        }
+
+        /**
+         * Creates list item 'row' by setting constraints to single items positioning them in process
+         * 'row' means that it looks like all views are in a row but technically all views are on their own.
+         */
+        fun generateRow(prevView: View){
+            // First add view before cloning otherwise changes won't happen
+            parent.addView(descriptionView)
+            parent.addView(doneBut)
+            parent.addView(mehBut)
+            parent.addView(cancelBut)
+            val constraintSet = ConstraintSet()
+            //all views added? Ok clone constraints
+            constraintSet.clone(parent)
+            // position TextView
+            constraintSet.connect(descriptionView.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin*2)
+            constraintSet.connect(descriptionView.id,ConstraintSet.LEFT,parent.id,ConstraintSet.LEFT,margin)
+            constraintSet.connect(descriptionView.id,ConstraintSet.RIGHT,cancelBut.id,ConstraintSet.LEFT)
+            constraintSet.constrainWidth(descriptionView.id,ConstraintSet.MATCH_CONSTRAINT)
+            constraintSet.constrainHeight(descriptionView.id,ConstraintSet.WRAP_CONTENT)
+
+            // position cancelBut
+            constraintSet.connect(cancelBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(cancelBut.id,ConstraintSet.RIGHT,mehBut.id,ConstraintSet.LEFT)
+            constraintSet.constrainWidth(cancelBut.id,minHeight)
+            constraintSet.constrainHeight(cancelBut.id,minHeight)
+
+            // position mehBut
+            constraintSet.connect(mehBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(mehBut.id,ConstraintSet.RIGHT,doneBut.id,ConstraintSet.LEFT)
+            constraintSet.constrainWidth(mehBut.id,minHeight)
+            constraintSet.constrainHeight(mehBut.id,minHeight)
+
+            // position doneBut
+            constraintSet.connect(doneBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(doneBut.id,ConstraintSet.RIGHT,parent.id,ConstraintSet.RIGHT,margin)
+            constraintSet.constrainWidth(doneBut.id,minHeight)
+            constraintSet.constrainHeight(doneBut.id,minHeight)
+
+            // Make sure that text view is at least as high as buttons - all list items are aligned vertically
+            // based on bottom part of previous text view
+            descriptionView.minHeight = minHeight
+
+            // And finally make the changes happen.
+            TransitionManager.beginDelayedTransition(parent)
+            constraintSet.applyTo(parent)
+        }
     }
 
     interface Callback{
