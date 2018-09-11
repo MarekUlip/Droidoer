@@ -25,11 +25,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     /**
      * Sub task category
      */
-    var category:Int = 0
+    private var category:Int = 0
     /**
      * Indicates wheter activity is displaying completed main tasks
      */
-    var displayingCompleted = false
+    private var displayingCompleted = false
     var fragment: TodoFragment? = null
     var spinner: Spinner? = null
 
@@ -59,14 +59,13 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     override fun onBackPressed() {
-        if (displayingCompleted){
-            displayingCompleted = false
-            fragment?.isDisplayingCompleted = false
-        } else if(category!= 0){
-            spinner?.setSelection(0)
-        }
-        else{
-            finish()
+        when {
+            displayingCompleted -> {
+                displayingCompleted = false
+                fragment?.isDisplayingCompleted = false
+            }
+            category!= 0 -> spinner?.setSelection(0)
+            else -> finish()
         }
     }
 
