@@ -46,6 +46,10 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             holder.mView.showContextMenu()
             true
         }
+        holder.mNameView.setOnClickListener{
+            listener.setMainTaskHldr(item)
+            listener.displayQuickDialog(true,item.name)
+        }
         holder.mView.setOnCreateContextMenuListener { menu, _, _ ->
             if(isSubTaskSetting){
                 // Context menu was raised by some sub items. Don't display anything else
@@ -101,6 +105,10 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 view.descriptionView.showContextMenu()
                 listener.setSubTaskHldr(value)
                 true  }
+            view.descriptionView.setOnClickListener {
+                listener.setSubTaskHldr(value)
+                listener.displayQuickDialog(false,value.description)
+            }
 
             view.descriptionView.setOnCreateContextMenuListener { menu, _, _ ->
                 menu.add(0,R.id.action_rename_sub,0,R.string.rename)
@@ -242,5 +250,6 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
         fun onSubTaskAdding(mainTask: MainTask)
         fun setMainTaskHldr(mainTask: MainTask)
         fun setSubTaskHldr(subTask: SubTask)
+        fun displayQuickDialog(isMain:Boolean, text:String)
     }
 }

@@ -22,6 +22,7 @@ private const val CATEGORY = "category"
  * create an instance of this fragment.
  */
 class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
+
     var category = 0
     set(value) {
         field = value
@@ -82,6 +83,14 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
 
     override fun onSubTaskAdding(mainTask: MainTask) {
         createSubDialog(true,null,mainTask.id as Long)
+    }
+
+    override fun displayQuickDialog(isMain: Boolean, text: String) {
+        if(isMain){
+            createMainDialog(false,text)
+        } else{
+            createSubDialog(false,text,subTaskHolder?.mainTaskId as Long)
+        }
     }
 
     fun addMainTask(){
