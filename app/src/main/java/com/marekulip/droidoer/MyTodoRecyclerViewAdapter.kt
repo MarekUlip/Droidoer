@@ -87,17 +87,17 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
                 view.cancelBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_CANCELED,position) }
                 view.doneBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_DONE,position) }
                 view.mehBut.setOnClickListener { listener.onCategoryChange(value,SubTask.CAT_MEH,position) }
-                view.descriptionView.setBackgroundColor(Color.WHITE)
+                view.setBackgroundColor(Color.WHITE)
             }else{
                 view.cancelBut.visibility = View.GONE
                 view.mehBut.visibility = View.GONE
                 view.doneBut.text = textReturn
                 view.doneBut.setOnClickListener { listener.onCategoryChange(value, SubTask.CAT_NONE,position) }
                 when(value.category){
-                    0 -> view.descriptionView.setBackgroundColor(Color.WHITE)
-                    1 -> view.descriptionView.setBackgroundColor(colorCancel)
-                    2 -> view.descriptionView.setBackgroundColor(colorMeh)
-                    3 -> view.descriptionView.setBackgroundColor(colorDone)
+                    0 -> view.setBackgroundColor(Color.WHITE)
+                    1 -> view.setBackgroundColor(colorCancel)
+                    2 -> view.setBackgroundColor(colorMeh)
+                    3 -> view.setBackgroundColor(colorDone)
                 }
             }
             view.descriptionView.setOnLongClickListener{
@@ -150,7 +150,8 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
      * Sub view holder acting as wrapping layout except it does not have a layout. It has been created
      * to increase performance because layout in layout in list item is really bad idea... easy to work with
      * but BAD! With this holder the app is taking only one third of a time to display list items. Neat right?
-     * Only con is that it does not look so good... its decent... but not good.
+     * And since last update there is no disadvantage just win win. And that's what developers love!
+     * Or at least I do.
      */
     inner class SubViewHolder(val parent:ConstraintLayout){
         /**
@@ -170,12 +171,21 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
         val mehBut = Button(parent.context)
         val cancelBut = Button(parent.context)
         val descriptionView = TextView(parent.context)
+        /**
+         * View used to set background color under buttons so the list item feels more like an item.
+         * Usually wrapping view would do but since sub items have all same parent wrapper they cant
+         * set background that would please all. That is why this text view workaround is used. Now
+         * sub item looks the same as if it has layout wrapping it but it takes less time to draw them all.
+         */
+        private val backgroundView = TextView(parent.context)
 
         init {
             // Init views with properties that don't change
             descriptionView.id = View.generateViewId()
             descriptionView.setPadding(margin,margin,margin,margin)
             descriptionView.setTextColor(Color.BLACK)
+
+            backgroundView.id = View.generateViewId()
 
             doneBut.id = View.generateViewId()
             doneBut.setTextColor(doneButTextColor)
@@ -195,7 +205,18 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             parent.removeView(mehBut)
             parent.removeView(cancelBut)
             parent.removeView(descriptionView)
+            parent.removeView(backgroundView)
         }
+
+        /**
+         * Helper function simulating setting background color for sub item. Used because now it is
+         * necessary to set background to two views.
+         */
+        fun setBackgroundColor(color: Int){
+            descriptionView.setBackgroundColor(color)
+            backgroundView.setBackgroundColor(color)
+        }
+
 
         /**
          * Creates list item 'row' by setting constraints to single items positioning them in process
@@ -204,6 +225,7 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
         fun generateRow(prevView: View){
             // First add view before cloning otherwise changes won't happen
             parent.addView(descriptionView)
+            parent.addView(backgroundView)
             parent.addView(doneBut)
             parent.addView(mehBut)
             parent.addView(cancelBut)
@@ -239,6 +261,15 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             // based on bottom part of previous text view
             descriptionView.minHeight = minHeight
 
+            // position background view so it is set behind buttons and has same height as description view
+            constraintSet.connect(backgroundView.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin*2)
+            constraintSet.connect(backgroundView.id,ConstraintSet.LEFT,descriptionView.id,ConstraintSet.RIGHT)
+            constraintSet.connect(backgroundView.id,ConstraintSet.RIGHT,parent.id,ConstraintSet.RIGHT,margin)
+            constraintSet.connect(backgroundView.id,ConstraintSet.BOTTOM,descriptionView.id,ConstraintSet.BOTTOM)
+            constraintSet.constrainWidth(backgroundView.id,ConstraintSet.MATCH_CONSTRAINT)
+            constraintSet.constrainHeight(backgroundView.id,ConstraintSet.MATCH_CONSTRAINT)
+
+
             // And finally make the changes happen.
             TransitionManager.beginDelayedTransition(parent)
             constraintSet.applyTo(parent)
@@ -246,10 +277,29 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
     }
 
     interface Callback{
+        /**
+         * Raised when category of [subTask] is about to change. Listener should handle category changing
+         * @param position position of main task item in [mValues] (used for updating view holding that item) Updating should be done by listener
+         */
         fun onCategoryChange(subTask: SubTask, category: Int, position: Int)
+
+        /**
+         * Raised when new sub task is being added. Listener should handle adding.
+         */
         fun onSubTaskAdding(mainTask: MainTask)
+
+        /**
+         * Sets listener's main task holder so listener can work with it. (update, rename, delete)
+         */
         fun setMainTaskHldr(mainTask: MainTask)
+        /**
+         * Sets listener's sub task holder so listener can work with it. (update, rename, delete)
+         */
         fun setSubTaskHldr(subTask: SubTask)
+
+        /**
+         * Displays dialog after onClick action is raised. Used for quick renaming of main or sub task.
+         */
         fun displayQuickDialog(isMain:Boolean, text:String)
     }
 }
