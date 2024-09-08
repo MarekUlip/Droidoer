@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return true
     }
 
+    @Deprecated("keeping because support is minimal")
     override fun onBackPressed() {
         when {
             displayingCompleted -> {
