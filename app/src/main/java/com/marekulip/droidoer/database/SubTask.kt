@@ -1,8 +1,10 @@
 package com.marekulip.droidoer.database
 
-import android.arch.persistence.room.*
-import android.arch.persistence.room.ForeignKey.CASCADE
+
+import androidx.room.*
 import android.provider.BaseColumns
+import androidx.room.ForeignKey.CASCADE
+
 @Entity(tableName = SubTask.TABLE_NAME,
         foreignKeys = [ForeignKey(entity = MainTask::class,
         parentColumns = arrayOf("id"),

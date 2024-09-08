@@ -2,19 +2,19 @@ package com.marekulip.droidoer
 
 import android.content.Context
 import android.graphics.Color
-import android.support.constraint.ConstraintLayout
-import android.support.constraint.ConstraintSet
-import android.support.v7.widget.RecyclerView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import android.transition.TransitionManager
 import android.util.TypedValue
 import android.view.*
 import android.widget.Button
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.marekulip.droidoer.database.MainTask
 import com.marekulip.droidoer.database.SubTask
 import kotlinx.android.synthetic.main.list_item.view.*
 
-class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback):RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
+class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context: Context,private val listener: Callback): RecyclerView.Adapter<MyTodoRecyclerViewAdapter.ViewHolder>(){
 
     var category = 0
     private val textDone = context.getString(R.string.check_mark)
@@ -153,7 +153,7 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
      * And since last update there is no disadvantage just win win. And that's what developers love!
      * Or at least I do.
      */
-    inner class SubViewHolder(val parent:ConstraintLayout){
+    inner class SubViewHolder(val parent: ConstraintLayout){
         /**
          * Precomputed minimal height. Dimensions are set in pixels so they have to be transformed into
          * dp unit before use... well they don't have to but then it looks bad.
@@ -233,27 +233,27 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             //all views added? Ok clone constraints
             constraintSet.clone(parent)
             // position TextView
-            constraintSet.connect(descriptionView.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin*2)
-            constraintSet.connect(descriptionView.id,ConstraintSet.LEFT,parent.id,ConstraintSet.LEFT,margin)
-            constraintSet.connect(descriptionView.id,ConstraintSet.RIGHT,cancelBut.id,ConstraintSet.LEFT)
-            constraintSet.constrainWidth(descriptionView.id,ConstraintSet.MATCH_CONSTRAINT)
-            constraintSet.constrainHeight(descriptionView.id,ConstraintSet.WRAP_CONTENT)
+            constraintSet.connect(descriptionView.id, ConstraintSet.TOP,prevView.id, ConstraintSet.BOTTOM,margin*2)
+            constraintSet.connect(descriptionView.id, ConstraintSet.LEFT,parent.id, ConstraintSet.LEFT,margin)
+            constraintSet.connect(descriptionView.id, ConstraintSet.RIGHT,cancelBut.id, ConstraintSet.LEFT)
+            constraintSet.constrainWidth(descriptionView.id, ConstraintSet.MATCH_CONSTRAINT)
+            constraintSet.constrainHeight(descriptionView.id, ConstraintSet.WRAP_CONTENT)
 
             // position cancelBut
-            constraintSet.connect(cancelBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
-            constraintSet.connect(cancelBut.id,ConstraintSet.RIGHT,mehBut.id,ConstraintSet.LEFT)
+            constraintSet.connect(cancelBut.id, ConstraintSet.TOP,prevView.id, ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(cancelBut.id, ConstraintSet.RIGHT,mehBut.id, ConstraintSet.LEFT)
             constraintSet.constrainWidth(cancelBut.id,minHeight)
             constraintSet.constrainHeight(cancelBut.id,minHeight)
 
             // position mehBut
-            constraintSet.connect(mehBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
-            constraintSet.connect(mehBut.id,ConstraintSet.RIGHT,doneBut.id,ConstraintSet.LEFT)
+            constraintSet.connect(mehBut.id, ConstraintSet.TOP,prevView.id, ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(mehBut.id, ConstraintSet.RIGHT,doneBut.id, ConstraintSet.LEFT)
             constraintSet.constrainWidth(mehBut.id,minHeight)
             constraintSet.constrainHeight(mehBut.id,minHeight)
 
             // position doneBut
-            constraintSet.connect(doneBut.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin)
-            constraintSet.connect(doneBut.id,ConstraintSet.RIGHT,parent.id,ConstraintSet.RIGHT,margin)
+            constraintSet.connect(doneBut.id, ConstraintSet.TOP,prevView.id, ConstraintSet.BOTTOM,margin)
+            constraintSet.connect(doneBut.id, ConstraintSet.RIGHT,parent.id, ConstraintSet.RIGHT,margin)
             constraintSet.constrainWidth(doneBut.id,minHeight)
             constraintSet.constrainHeight(doneBut.id,minHeight)
 
@@ -262,12 +262,12 @@ class MyTodoRecyclerViewAdapter(var mValues: List<MainTask>,private val context:
             descriptionView.minHeight = minHeight
 
             // position background view so it is set behind buttons and has same height as description view
-            constraintSet.connect(backgroundView.id,ConstraintSet.TOP,prevView.id,ConstraintSet.BOTTOM,margin*2)
-            constraintSet.connect(backgroundView.id,ConstraintSet.LEFT,descriptionView.id,ConstraintSet.RIGHT)
-            constraintSet.connect(backgroundView.id,ConstraintSet.RIGHT,parent.id,ConstraintSet.RIGHT,margin)
-            constraintSet.connect(backgroundView.id,ConstraintSet.BOTTOM,descriptionView.id,ConstraintSet.BOTTOM)
-            constraintSet.constrainWidth(backgroundView.id,ConstraintSet.MATCH_CONSTRAINT)
-            constraintSet.constrainHeight(backgroundView.id,ConstraintSet.MATCH_CONSTRAINT)
+            constraintSet.connect(backgroundView.id, ConstraintSet.TOP,prevView.id, ConstraintSet.BOTTOM,margin*2)
+            constraintSet.connect(backgroundView.id, ConstraintSet.LEFT,descriptionView.id, ConstraintSet.RIGHT)
+            constraintSet.connect(backgroundView.id, ConstraintSet.RIGHT,parent.id, ConstraintSet.RIGHT,margin)
+            constraintSet.connect(backgroundView.id, ConstraintSet.BOTTOM,descriptionView.id, ConstraintSet.BOTTOM)
+            constraintSet.constrainWidth(backgroundView.id, ConstraintSet.MATCH_CONSTRAINT)
+            constraintSet.constrainHeight(backgroundView.id, ConstraintSet.MATCH_CONSTRAINT)
 
 
             // And finally make the changes happen.

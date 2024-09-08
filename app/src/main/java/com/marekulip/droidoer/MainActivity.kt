@@ -1,7 +1,6 @@
 package com.marekulip.droidoer
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,6 +9,8 @@ import android.widget.AdapterView
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         spinner.adapter = adapter
         spinner.onItemSelectedListener = this
         this.spinner = spinner
-        setSupportActionBar(toolbar)
+        setSupportActionBar(toolbar as Toolbar?)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         fragment = TodoFragment.newInstance(category)
         supportFragmentManager.beginTransaction().replace(R.id.fragment,fragment as TodoFragment).commit()

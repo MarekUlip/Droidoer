@@ -1,9 +1,9 @@
 package com.marekulip.droidoer.database
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
 import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 
 @Database(entities = [MainTask::class, SubTask::class], version = 1)
 abstract class DroidoerDatabase: RoomDatabase() {

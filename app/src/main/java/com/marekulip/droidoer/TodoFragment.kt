@@ -4,12 +4,12 @@ import android.app.AlertDialog
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.text.InputType
 import android.view.*
 import android.widget.EditText
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.marekulip.droidoer.database.DroidoerDatabase
 import com.marekulip.droidoer.database.MainTask
 import com.marekulip.droidoer.database.SubTask
@@ -120,8 +120,8 @@ class TodoFragment : Fragment(), MyTodoRecyclerViewAdapter.Callback {
         listener = null
     }
 
-    override fun onContextItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId){
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
             R.id.action_rename -> createMainDialog(false,mainTaskHolder?.name)
             R.id.action_delete -> deleteTask()
             R.id.action_mark_complete -> changeTaskCompletionStat(true)
